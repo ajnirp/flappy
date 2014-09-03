@@ -1,11 +1,14 @@
-var game = new Phaser.Game(400,490,Phaser.AUTO,'gameDiv');
+var game = new Phaser.Game(400, 490, Phaser.AUTO, 'gameDiv');
 
 var mainState = {
     preload: function () {
         game.stage.backgroundColor = '#71c5cf';
         
-        game.load.image('bird', 'assets/bird.png');
-        game.load.image('pipe', 'assets/pipe.png');
+        game.load.image('background', 'assets/background.png');
+        
+        game.load.spritesheet('bird', 'assets/bird/123.png', 68, 48, 3);
+        game.load.image('pipeTop', 'assets/pipe/top.png');
+        game.load.image('pipeBottom', 'assets/pipe/bottom.png');
         
         game.load.audio('jump', 'assets/jump.wav');
     },
@@ -13,41 +16,50 @@ var mainState = {
     create: function () {
         game.physics.startSystem(Phaser.Physics.ARCADE);
         
-        this.bird = this.game.add.sprite(100, 245, 'bird');
+        this.bird = game.add.sprite(100, 245, 'bird');
+        this.bird.animations.add('flapWings');
+        this.bird.animations.play('flapWings', 10, true);
+        
         game.physics.arcade.enable(this.bird);
         this.bird.body.gravity.y = 1000;
-        
-        this.pipes = game.add.group();
-        this.pipes.enableBody = true;
-        this.pipes.createMultiple(20, 'pipe');
         
         var spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
         spaceKey.onDown.add(this.jump, this);
         
-        this.timer = game.time.events.loop(1500, this.addRowOfPipes, this);
+        this.timer = game.time.events.loop(1500, this.addPipes, this);
         
-        this.score = 0;
-        this.labelScore = game.add.text(20, 20, "0", { font: "30px Arial", fill: "#ffffff" });
+        this.initializeScore();
         
         this.jumpSound = game.add.audio('jump');
+        
+        this.pipes = {};
+        this.pipeId = 0;
+    },
+    
+    initializeScore: function () {
+        this.score = 0;
+        this.labelScore = game.add.text(20, 20, "0", { font: "30px Arial", fill: "#ffffff" });
     },
     
     update: function () {
-        if (this.bird.angle < 20) {
+        if (this.bird.angle < 20)
             this.bird.angle += 1;
-        }
         
-        if (this.bird.inWorld == false) {
+        if (this.bird.inWorld == false)
             this.restartGame();
+        
+        for (var key in this.pipes) {
+            if (this.pipes.hasOwnProperty(key)) {
+                var pipe = this.pipes[key];
+                game.physics.arcade.overlap(this.bird, pipe, this.hitPipe, null, this);
+            }
         }
         
-        game.physics.arcade.overlap(this.bird, this.pipes, this.hitPipe, null, this);
     },
     
     jump: function () {
-        if (this.bird.alive == false) {
+        if (this.bird.alive == false)
             return;
-        }
         
         this.jumpSound.play();
         
@@ -61,37 +73,59 @@ var mainState = {
         game.state.start('main');
     },
     
-    addOnePipe: function (x, y) {
-        var pipe = this.pipes.getFirstDead();
-        pipe.reset(x, y);
-        pipe.body.velocity.x = -200;
-        pipe.checkWorldBounds = true;
-        pipe.outOfBoundsKill = true;
+    addPipes: function () {
+        var pipesGap = 165;
+        // y coordinate of top of the gap
+        var gapTop = 50 + Math.floor(Math.random() * (490 - 300));
+        
+        var pipeTop = game.add.sprite(400, gapTop - 490, 'pipeTop');
+        var pipeBottom = game.add.sprite(400, gapTop + pipesGap, 'pipeBottom');
+        
+        pipeTop.pipeId = this.pipeId++;
+        pipeBottom.pipeId = this.pipeId++;
+        
+        this.pipes[pipeTop.pipeId] = pipeTop;
+        this.pipes[pipeBottom.pipeId] = pipeBottom;
+        
+        game.physics.arcade.enable(pipeTop);
+        game.physics.arcade.enable(pipeBottom);
+        
+        pipeTop.body.velocity.x = -200;
+        pipeBottom.body.velocity.x = -200;
+        
+        pipeTop.checkWorldBounds = true;
+        pipeBottom.checkWorldBounds = true;
+        
+        pipeTop.events.onOutOfBounds.add(this.pipeOutOfBounds, this);
+        pipeBottom.events.onOutOfBounds.add(this.pipeOutOfBounds, this);
+        
+        pipeTop.outOfBoundsKill = true;
+        pipeBottom.outOfBoundsKill = true;
+        
+        this.incrementScore();
     },
     
-    addRowOfPipes: function () {
-        var hole = Math.floor(Math.random() * 5) + 1;
-        for (var i = 0 ; i < 8 ; i++) {
-            if (i != hole && i != hole + 1) {
-                this.addOnePipe(400, i*60 + 10);
-            }
-        }
-        
+    pipeOutOfBounds: function (pipe) {
+        delete this.pipes[pipe.pipeId];
+    },
+    
+    incrementScore: function () {
         this.score += 1;
         this.labelScore.text = this.score;
     },
     
     hitPipe: function () {
-        if (this.bird.alive == false) {
+        if (this.bird.alive == false)
             return;
-        }
         
         this.bird.alive = false;
         
         game.time.events.remove(this.timer);
-        this.pipes.forEachAlive(function (p) {
-            p.body.velocity.x = 0;
-        }, this);
+        
+        // stop all pipes from moving
+        for (var key in this.pipes)
+            if (this.pipes.hasOwnProperty(key))
+                this.pipes[key].body.velocity.x = 0;
     }
 };
 
