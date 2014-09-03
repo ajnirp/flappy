@@ -1,9 +1,8 @@
-[Play it here](https://wenderen.github.io/flappy)
 
 About
 -----
 
-Flappy bird clone for practice.
+Flappy bird clone for practice. [Play it here](https://wenderen.github.io/flappy) (not yet done)
 
 Controls
 --------
