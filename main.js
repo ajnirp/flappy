@@ -59,7 +59,7 @@ var mainState = {
                 game.physics.arcade.overlap(this.bird, pipe, this.hitPipe, null, this);
             }
         }
-        
+
     },
     
     jump: function () {
@@ -86,8 +86,10 @@ var mainState = {
         var pipeTop = game.add.sprite(400, gapTop - 490, 'pipeTop');
         var pipeBottom = game.add.sprite(400, gapTop + pipesGap, 'pipeBottom');
         
-        pipeTop.pipeId = this.pipeId++;
-        pipeBottom.pipeId = this.pipeId++;
+        pipeTop.pipeId = this.pipeId;
+        this.pipeId = (1 + this.pipeId) % 4;
+        pipeBottom.pipeId = this.pipeId;
+        this.pipeId = (1 + this.pipeId) % 4;
         
         this.pipes[pipeTop.pipeId] = pipeTop;
         this.pipes[pipeBottom.pipeId] = pipeBottom;
