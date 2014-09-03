@@ -27,6 +27,7 @@ var mainState = {
         spaceKey.onDown.add(this.jump, this);
         
         this.timer = game.time.events.loop(1500, this.addPipes, this);
+//        this.timer = game.time.events.loop(3000, this.logStuff, this);
         
         this.initializeScore();
         
@@ -34,6 +35,10 @@ var mainState = {
         
         this.pipes = {};
         this.pipeId = 0;
+    },
+    
+    logStuff: function () {
+        console.log(this.pipeId);
     },
     
     initializeScore: function () {
@@ -74,7 +79,7 @@ var mainState = {
     },
     
     addPipes: function () {
-        var pipesGap = 165;
+        var pipesGap = 140;
         // y coordinate of top of the gap
         var gapTop = 50 + Math.floor(Math.random() * (490 - 300));
         
