@@ -2,19 +2,19 @@ var game = new Phaser.Game(400, 490, Phaser.AUTO, 'gameDiv');
 
 var mainState = {
     preload: function () {
-        game.stage.backgroundColor = '#71c5cf';
-        
-        game.load.image('background', 'assets/background.png');
-        
         game.load.spritesheet('bird', 'assets/bird/123.png', 68, 48, 3);
+        
         game.load.image('pipeTop', 'assets/pipe/top.png');
         game.load.image('pipeBottom', 'assets/pipe/bottom.png');
+        
+        game.load.image('background', 'assets/back.png');
         
         game.load.audio('jump', 'assets/jump.wav');
     },
     
     create: function () {
         game.physics.startSystem(Phaser.Physics.ARCADE);
+        game.add.sprite(0, 0, 'background');
         
         this.bird = game.add.sprite(100, 245, 'bird');
         this.bird.animations.add('flapWings');
