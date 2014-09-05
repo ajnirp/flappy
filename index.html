@@ -5,11 +5,29 @@
         <title>Flappy Bird Clone</title>
         
         <script type="text/javascript" src="phaser.min.js"></script>
-        <script type="text/javascript" src="main.js"></script>
+        <script type="text/javascript" src="boot.js"></script>
+        <script type="text/javascript" src="menu.js"></script>
+        <script type="text/javascript" src="play.js"></script>
     </head>
-    
+    <style>
+    body {
+        font-family: Arial, sans-serif;
+    }
+    #gameDiv {
+        position: absolute;
+        width: 400px; height: 490px;
+        margin-left: -200px;
+        margin-top: -245px;
+        left: 50%; top: 50%;
+        
+        border: 1px solid black;
+    }
+    p {
+        text-align: center;
+    }
+    </style>
     <body>
-        <p>Spacebar to jump</p>
+        <p><strong>Controls</strong>: Spacebar to jump</p>
         <div id="gameDiv"></div>
     </body>
 </html>
