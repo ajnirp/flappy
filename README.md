@@ -2,7 +2,7 @@
 About
 -----
 
-Flappy bird clone for practice. [Play it here](https://wenderen.github.io/flappy)
+Flappy bird clone for practice. [Play it here](https://ajnirp.github.io/flappy)
 
 Controls
 --------
